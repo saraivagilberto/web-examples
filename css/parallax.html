@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="http://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
   <style type="text/css">  
         html,body {
             min-height:100%;
@@ -129,71 +129,77 @@
     <div class="container">
         <div class="parallaxContent">            
             <h1>Look, a content here!</h1>
-            <button onclick="addContent()">Add new content</button>
+            <button onclick="addContent()">Add new content</button>            
         </div>      
     </div>
 
     <script type="text/javascript">
-
-    function scrollPos() {
-        let doc = document.documentElement;
-        return {
-            left: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
-            top: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0),
-            right: Math.max(document.body.scrollWidth, doc.scrollWidth, document.body.offsetWidth, doc.offsetWidth, doc.clientWidth),
-            bottom: Math.max(document.body.scrollHeight, doc.scrollHeight, document.body.offsetHeight, doc.offsetHeight, doc.clientHeight)
-        };
-    }
-
-    function backgroundRoll(e)
-    {
-        let scroll = scrollPos();
-        dbgs = document.getElementsByClassName('background');
-
-        let dbgW = document.documentElement.clientWidth;
-        let scrollFactor = Math.min(dbgs.length - 1, Math.floor(scroll.top / (scroll.bottom / dbgs.length)));        
-
-        let pageIs = 0;
-        let highLighted = (dbgs.length == 1)? 1 : 0.75;
-        
-        let degW = [];
-        for (let dbg of dbgs)
-            degW.push(dbgs.length - Math.abs(pageIs++ - scrollFactor));
-        degW = degW.map((e) => e * e);
-
-        let degWf = (degW.reduce((a, e) => { return a + e }));
-
-        pageIs = 0;
-        let offSet = 0;        
-        for (let dbg of dbgs)
-        {
-            let df = degW[pageIs++];
-            let dw = dbgW / degWf * df;
-            dbg.style.width = dw + 'px';
-            dbg.style.left = offSet + 'px';
-
-            if (pageIs == scrollFactor + 1) 
-                dbg.style.backgroundPosition = -((scroll.top - (scrollFactor * (scroll.bottom / dbgs.length))) / 3) + 'px 50%';
-
-            offSet += dw;
+        function scrollPos() {
+            let doc = document.documentElement;
+            return {
+                left: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
+                top: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0),
+                right: Math.max(document.body.scrollWidth, doc.scrollWidth, document.body.offsetWidth, doc.offsetWidth, doc.clientWidth),
+                bottom: Math.max(document.body.scrollHeight, doc.scrollHeight, document.body.offsetHeight, doc.offsetHeight, doc.clientHeight)
+            };
         }
-    }
 
-    window.addEventListener('scroll', backgroundRoll);
-    window.addEventListener('resize', backgroundRoll, true);
-    window.addEventListener('load', function () { backgroundRoll(); document.getElementsByClassName('backgroundContainer')[0].style.visibility = 'visible'; });
+        var parallaxOwner = null;
+        var parallaxRefers = null;
 
-    function addContent(){
-        let newContent = document.getElementsByClassName('parallaxContent')[0].cloneNode(true);
-        document.getElementsByClassName('container')[0].appendChild(newContent);
+        function backgroundRoll(e)
+        {
+            let scroll = scrollPos();
+            dbgs = document.getElementsByClassName('background');
 
-        dbgs = document.getElementsByClassName('background');
-        let newDbg = document.createElement('div');
-        newDbg.className = 'background background' + (dbgs.length + 1);
-        document.getElementsByClassName('backgroundContainer')[0].appendChild(newDbg);
-        backgroundRoll(null);
-    }
+            let dbgW = parallaxOwner.clientWidth;
+            let scrollFactor = Math.min(dbgs.length - 1, Math.floor(scroll.top / (scroll.bottom / dbgs.length)));        
 
+            let pageIs = 0;
+            let highLighted = (dbgs.length == 1)? 1 : 0.75;
+            
+            let degW = [];
+            for (let dbg of dbgs)
+                degW.push(dbgs.length - Math.abs(pageIs++ - scrollFactor));
+            degW = degW.map((e) => e * e);
+
+            let degWf = (degW.reduce((a, e) => { return a + e }));
+
+            pageIs = 0;
+            let offSet = 0;        
+            for (let dbg of dbgs)
+            {
+                let df = degW[pageIs++];
+                let dw = dbgW / degWf * df;
+                dbg.style.width = dw + 'px';
+                dbg.style.left = offSet + 'px';
+
+                if (pageIs == scrollFactor + 1) 
+                    dbg.style.backgroundPosition = -((scroll.top - (scrollFactor * (scroll.bottom / dbgs.length))) / 3) + 'px 50%';
+
+                offSet += dw;
+            }
+        }
+
+        window.addEventListener('scroll', backgroundRoll);
+        window.addEventListener('resize', backgroundRoll, true);
+        window.addEventListener('load', function () {
+            parallaxOwner = document.getElementsByClassName('backgroundContainer')[0];
+            parallaxRefers =  document.getElementsByClassName('container')[0];
+            backgroundRoll(); 
+            parallaxOwner.style.visibility = 'visible'; 
+        });
+
+        function addContent(){
+            let newContent = document.getElementsByClassName('parallaxContent')[0].cloneNode(true);
+            document.getElementsByClassName('container')[0].appendChild(newContent);
+
+            dbgs = document.getElementsByClassName('background');
+            let newDbg = document.createElement('div');
+            newDbg.className = 'background background' + (dbgs.length + 1);
+            document.getElementsByClassName('backgroundContainer')[0].appendChild(newDbg);
+            backgroundRoll(null);
+        }
     </script>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
