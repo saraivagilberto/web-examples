@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <style type="text/css">  
+        html,body {
+            min-height:100%;
+            min-width:100%;
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            background: #000;
+        }
+
+        .backgroundContainer {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 75%;
+            overflow: hidden;
+            z-index: -9999;
+            clip-path: polygon(0% 0%, 100% 15%, 100% 75%, 0 100%);
+            visibility: hidden;
+        }
+
+        .backgroundContainer:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;  
+            background: rgba(0,0,0,0.2);
+        }
+
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            padding: 0;
+            margin: 0;
+            background-size: cover;
+            background-repeat: repeat;
+            background-attachment: fixed;            
+            background-position: 0% 50%;
+        }
+
+        .background:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -1px;
+            width: 10px;
+            height: 100%;
+            background: #000;
+            z-index: 1;
+            transform: rotate(2deg); 
+        }
+
+        .background:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -1px;
+            width: 10px;
+            height: 100%;
+            background: #000;  
+            z-index: 1;
+            transform: rotate(2deg);
+        }
+
+        .background:first-child:before {
+            width: 0;
+        }
+
+        .background:last-child:after {
+            width: 0;
+        }
+
+        .background:only-child:before, .background:only-child:after {
+            width: 0px;
+        }
+
+        .container {
+            height: 100%;
+            padding: 15px;
+        }
+
+        .parallaxContent {
+            height: 100%;
+            color: #fff;
+        }
+
+        /* Images */
+        .background1 {
+            background-image: url(http://vunature.com/wp-content/uploads/2017/01/trees-nature-red-leaves-contrast-fall-forest-seasons-landscapes-autumn-hd-animated-wallpaper.jpg);
+        }
+
+        .background2 {
+            background-image: url(http://vunature.com/wp-content/uploads/2017/01/lakes-lake-nature-reflection-winter-forest-desktop-wallpaper-free-download.jpg);
+        }
+
+        .background3 {
+            background-image: url(http://vunature.com/wp-content/uploads/2017/01/sunrise-sunset-landscapes-nature-cute-wallpaper-desktop-1920x1080.jpg);
+        }
+
+        .background4 {
+            background-image: url(http://vunature.com/wp-content/uploads/2017/01/mountains-snow-mountain-landscape-nature-winter-desktop-wallpaper-green-1920x1080.jpg);
+        }
+    </style>
+
+    <title>Web Examples - ClipPath Header</title>  
+</head>
+
+<body>
+  <header>
+    <div class="backgroundContainer">
+        <div class="background background1"></div>
+    </div>
+    </header>
+
+    <div class="container">
+        <div class="parallaxContent">            
+            <h1>Look, a content here!</h1>
+            <button onclick="addContent()">Add new content</button>
+        </div>      
+    </div>
+
+    <script type="text/javascript">
+
+    function scrollPos() {
+        let doc = document.documentElement;
+        return {
+            left: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
+            top: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0),
+            right: Math.max(document.body.scrollWidth, doc.scrollWidth, document.body.offsetWidth, doc.offsetWidth, doc.clientWidth),
+            bottom: Math.max(document.body.scrollHeight, doc.scrollHeight, document.body.offsetHeight, doc.offsetHeight, doc.clientHeight)
+        };
+    }
+
+    function backgroundRoll(e)
+    {
+        let scroll = scrollPos();
+        dbgs = document.getElementsByClassName('background');
+
+        let dbgW = document.documentElement.clientWidth;
+        let scrollFactor = Math.min(dbgs.length - 1, Math.floor(scroll.top / (scroll.bottom / dbgs.length)));        
+
+        let pageIs = 0;
+        let highLighted = (dbgs.length == 1)? 1 : 0.75;
+        
+        let degW = [];
+        for (let dbg of dbgs)
+            degW.push(dbgs.length - Math.abs(pageIs++ - scrollFactor));
+        degW = degW.map((e) => e * e);
+
+        let degWf = (degW.reduce((a, e) => { return a + e }));
+
+        pageIs = 0;
+        let offSet = 0;        
+        for (let dbg of dbgs)
+        {
+            let df = degW[pageIs++];
+            let dw = dbgW / degWf * df;
+            dbg.style.width = dw + 'px';
+            dbg.style.left = offSet + 'px';
+
+            if (pageIs == scrollFactor + 1) 
+                dbg.style.backgroundPosition = -((scroll.top - (scrollFactor * (scroll.bottom / dbgs.length))) / 3) + 'px 50%';
+
+            offSet += dw;
+        }
+    }
+
+    window.addEventListener('scroll', backgroundRoll);
+    window.addEventListener('resize', backgroundRoll, true);
+    window.addEventListener('load', function () { backgroundRoll(); document.getElementsByClassName('backgroundContainer')[0].style.visibility = 'visible'; });
+
+    function addContent(){
+        let newContent = document.getElementsByClassName('parallaxContent')[0].cloneNode(true);
+        document.getElementsByClassName('container')[0].appendChild(newContent);
+
+        dbgs = document.getElementsByClassName('background');
+        let newDbg = document.createElement('div');
+        newDbg.className = 'background background' + (dbgs.length + 1);
+        document.getElementsByClassName('backgroundContainer')[0].appendChild(newDbg);
+        backgroundRoll(null);
+    }
+
+    </script>
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script type="text/javascript" src="http://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>
+
