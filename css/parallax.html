@@ -13,20 +13,35 @@
             height: 100%;
             margin: 0;
         }
+
         body {
-            background: #000;
+            background: #ccc;
         }
 
         .backgroundContainer {
-            position: fixed;
-            top: 0;
+            position: relative;
+            margin: auto;
             width: 100%;
-            height: 75%;
+            height: 100%;
             overflow: hidden;
             z-index: -9999;
             clip-path: polygon(0% 0%, 100% 15%, 100% 75%, 0 100%);
             visibility: hidden;
+            background: #000;
         }
+
+        .backgroundBorder {
+            content: '';
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 85%;
+            padding: 10px;
+            overflow: hidden;
+            z-index: -9999;
+            clip-path: polygon(0% 0%, 100% 15%, 100% 75%, 0 100%);
+            background: #000;
+        }        
 
         .backgroundContainer:after {
             content: '';
@@ -76,6 +91,16 @@
             transform: rotate(2deg);
         }
 
+        @media (min-width: 1200px) {
+            .background:before {
+                transform: rotate(1deg); 
+            }
+
+            .background:after {
+                transform: rotate(1deg);
+            }
+        }
+
         .background:first-child:before {
             width: 0;
         }
@@ -96,23 +121,13 @@
         .parallaxContent {
             height: 100%;
             color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 10px;
         }
 
         /* Images */
         .background1 {
-            background-image: url(http://vunature.com/wp-content/uploads/2017/01/trees-nature-red-leaves-contrast-fall-forest-seasons-landscapes-autumn-hd-animated-wallpaper.jpg);
-        }
-
-        .background2 {
-            background-image: url(http://vunature.com/wp-content/uploads/2017/01/lakes-lake-nature-reflection-winter-forest-desktop-wallpaper-free-download.jpg);
-        }
-
-        .background3 {
-            background-image: url(http://vunature.com/wp-content/uploads/2017/01/sunrise-sunset-landscapes-nature-cute-wallpaper-desktop-1920x1080.jpg);
-        }
-
-        .background4 {
-            background-image: url(http://vunature.com/wp-content/uploads/2017/01/mountains-snow-mountain-landscape-nature-winter-desktop-wallpaper-green-1920x1080.jpg);
+            background-image: url(https://source.unsplash.com/random?rand=1);
         }
     </style>
 
@@ -120,11 +135,11 @@
 </head>
 
 <body>
-  <header>
-    <div class="backgroundContainer">
-        <div class="background background1"></div>
+    <div class="backgroundBorder">
+        <div class="backgroundContainer">
+            <div class="background background1"></div>
+        </div>
     </div>
-    </header>
 
     <div class="container">
         <div class="parallaxContent">            
@@ -145,15 +160,16 @@
         }
 
         var parallaxOwner = null;
-        var parallaxRefers = null;
+        var parallaxFirstContent = null;
 
         function backgroundRoll(e)
         {
             let scroll = scrollPos();
             dbgs = document.getElementsByClassName('background');
 
+
             let dbgW = parallaxOwner.clientWidth;
-            let scrollFactor = Math.min(dbgs.length - 1, Math.floor(scroll.top / (scroll.bottom / dbgs.length)));        
+            let scrollFactor = Math.min(dbgs.length - 1, Math.floor(scroll.top / ((scroll.bottom - parallaxFirstContent.top) / dbgs.length)));        
 
             let pageIs = 0;
             let highLighted = (dbgs.length == 1)? 1 : 0.75;
@@ -185,7 +201,7 @@
         window.addEventListener('resize', backgroundRoll, true);
         window.addEventListener('load', function () {
             parallaxOwner = document.getElementsByClassName('backgroundContainer')[0];
-            parallaxRefers =  document.getElementsByClassName('container')[0];
+            parallaxFirstContent = document.getElementsByClassName('parallaxContent')[0].getBoundingClientRect();
             backgroundRoll(); 
             parallaxOwner.style.visibility = 'visible'; 
         });
@@ -196,7 +212,9 @@
 
             dbgs = document.getElementsByClassName('background');
             let newDbg = document.createElement('div');
-            newDbg.className = 'background background' + (dbgs.length + 1);
+            newDbg.className = 'background';
+            newDbg.style.backgroundImage = 'url("https://source.unsplash.com/random?rand=' + (dbgs.length + 1) + '")';
+
             document.getElementsByClassName('backgroundContainer')[0].appendChild(newDbg);
             backgroundRoll(null);
         }
